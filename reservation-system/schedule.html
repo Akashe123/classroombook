@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Schedule Calendar</title>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+    header { background: #007aff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .calendar-header { display: flex; justify-content: center; align-items: center; margin: 10px 0; }
+    .calendar-header button { font-size: 1.5rem; background: none; border: none; cursor: pointer; color: #007aff; padding: 5px 10px; }
+    #month-year-label { font-weight: bold; margin: 0 10px; font-size: 1.2rem; }
+    .calendar { display: grid; grid-template-columns: repeat(7,1fr); gap:1px; max-width:1000px; margin:auto; background:#ccc; }
+    .calendar div { background:white; padding:20px 5px; text-align:center; height:100px; position:relative; }
+    .calendar .header { background:#f0f0f0; font-weight:bold; }
+    .dot { width:8px; height:8px; background:#007aff; border-radius:50%; position:absolute; bottom:8px; left:50%; transform:translateX(-50%); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span id="month-year-label">Month Year</span>
+    <button onclick="window.close()">Close ✖</button>
+  </header>
+
+  <div class="calendar-header">
+    <button onclick="prevMonth()">‹</button>
+    <span id="month-year-label-span"></span><!-- changed to avoid duplication -->
+    <button onclick="nextMonth()">›</button>
+  </div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <script>
+    const calendarEl = document.getElementById('calendar');
+    const monthYearDisplay = document.getElementById('month-year-label');
+    const monthYearSpan = document.getElementById('month-year-label-span');
+
+    const rawBookings = JSON.parse(localStorage.getItem('bookingsList')) || [];
+    const bookings = {};
+   
+  rawBookings.forEach(b => {
+    const start = new Date(`${b.startDate}T${b.startTime}`);
+    const end = new Date(`${b.endDate}T${b.endTime}`);
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      bookings[dateStr] = bookings[dateStr] || [];
+      bookings[dateStr].push({ room: b.roomName, time: `${b.startTime} - ${b.endTime}`, purpose: b.purpose });
+    }
+  });
+
+    let currentDate = new Date();
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    function renderCalendar() {
+      calendarEl.innerHTML = '';
+      const header = currentDate.toLocaleString('default', { month:'long', year:'numeric' });
+      monthYearDisplay.textContent = header;
+      monthYearSpan.textContent = header;
+
+      days.forEach(day => {
+        const div = document.createElement('div');
+        div.className = 'header';
+        div.textContent = day;
+        calendarEl.appendChild(div);
+      });
+
+      const year = currentDate.getFullYear(), month = currentDate.getMonth();
+      const firstDay = new Date(year,month,1).getDay();
+      const totalDays = new Date(year,month+1,0).getDate();
+
+      for (let i=0; i<firstDay; i++) calendarEl.appendChild(document.createElement('div'));
+
+      for (let d=1; d<=totalDays; d++) {
+        const cell = document.createElement('div');
+        cell.textContent = d;
+        const ymd = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        if (bookings[ymd]) {
+          const dot = document.createElement('div');
+          dot.className = 'dot';
+          cell.appendChild(dot);
+          cell.style.cursor = 'pointer';
+          cell.onclick = () => showBookings(ymd);
+        }
+        calendarEl.appendChild(cell);
+      }
+    }
+
+    function prevMonth(){ currentDate.setMonth(currentDate.getMonth()-1); renderCalendar(); }
+    function nextMonth(){ currentDate.setMonth(currentDate.getMonth()+1); renderCalendar(); }
+
+    function showBookings(date) {
+      const data = bookings[date] || [];
+      if (data.length===0) return;
+      let msg = `📅 Bookings for ${date}:\n\n`;
+      data.forEach((b,i)=> {
+        msg += `${i+1}. Room: ${b.room}\n   Time: ${b.time}\n   Purpose: ${b.purpose}\n\n`;
+      });
+      alert(msg);
+    }
+
+    window.onload = renderCalendar;
+    window.onfocus = renderCalendar;
+  </script>
+</body>
+</html>

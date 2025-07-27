@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Classroom Reservation</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">CampusBook</div>
+    <nav>
+      <a href="#" id="home-link">Home</a>
+      <a href="schedule.html" target="_blank">Schedule</a>
+      <a href="#contact" id="contact-link">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Book Your Classroom</h1>
+      <p>Reserve study or club spaces at your convenience</p>
+    </div>
+  </section>
+
+  <section class="rooms" id="room-list"></section>
+
+  <div id="booking-modal">
+    <form id="booking-form" onsubmit="submitBooking(event)">
+      <h2>Book <span id="modal-room-name"></span></h2>
+
+      <label for="start">Start Date:</label>
+      <input type="date" name="start" required>
+
+      <label for="end">End Date:</label>
+      <input type="date" name="end" required>
+
+      <label for="startTime">Start Time:</label>
+      <input type="time" name="startTime" required>
+
+      <label for="endTime">End Time:</label>
+      <input type="time" name="endTime" required>
+
+      <label for="purpose">Purpose:</label>
+      <input type="text" name="purpose" placeholder="e.g. Workshop or Class" required>
+
+      <button type="submit">Submit Booking</button>
+      <button type="button" onclick="closeModal()">Cancel</button>
+    </form>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 500px; width: 90%; text-align: center;">
+      <h2>Contact Us</h2>
+      <p>Email: support@campusbook.com</p>
+      <p>Phone: +1 (555) 123-4567</p>
+      <p>Office Hours: Mon-Fri, 9am - 5pm</p>
+      <button onclick="closeContactModal()" style="margin-top: 1rem; padding: 10px 20px; border: none; background: #007aff; color: white; border-radius: 5px;">Close</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
